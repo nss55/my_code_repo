@@ -1,0 +1,35 @@
+#!/bin/bash
+readarray  original_point < <(lsblk | tail -n 1 | awk '{print $1}')
+data_file="${original_point}"
+#ssd_disk=("/dev/sdb)
+ssd_disk=("/dev/$data_file")    
+# Get array length
+length=${#ssd_disk[@]}
+#mount_points=("/mnt/$dir_name)
+#for ((i=0;i<$length; i++))
+
+#do
+ #disk_name="/dev/${original_point[i]}
+ #mount_point="/etc/$dir_name
+# Use a for loop to create the directories
+for ((i=0;i<$length;i++))
+
+do
+    dir_name="dir$i"
+    disk_name="${ssd_disk[i]}"
+    mount_points=("/mnt/$dir_name")
+    mount_point="${mount_points[i]}"
+   # mount_point=("/mnt/$dir_name)
+#we should format the disk to ext4
+ sudo mkfs.ext4 -m 0 -F -E lazy_itable_init=0,lazy_journal_init=0,discard "$disk_name"
+#create the mount poin
+  sudo mkdir -p "$mount_point"
+# Mount the disk
+  sudo mount -o discard,defaults "$disk_name" "$mount_point"
+#give permission to the directory
+ sudo chmod a+w "$mount_point"
+#take backup file
+ sudo cp /etc/fstab /etc/fstab.backup
+# Add the disk to /etc/fstab for automatic mounting on boot
+  echo UUID=$(sudo blkid -s UUID -o value "$disk_name") "$mount_point" ext4 discard,defaults,noatime,nofail 0 2 | sudo tee -a /etc/fstab
+done
