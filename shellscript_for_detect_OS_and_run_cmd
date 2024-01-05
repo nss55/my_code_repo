@@ -1,0 +1,30 @@
+#!/bin/bash 
+
+if [ -f /etc/os-release ]; then
+     source /etc/os-release
+    if [ "$ID" = "ubuntu" ] || [ "$ID" = "debian" ]; then
+        echo "Detected Ubuntu/Debian. Installing Git..."
+        sudo apt update
+        sudo apt install -y git
+        ##install chrome
+        wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+        sudo dpkg -i google-chrome-stable_current_amd64.deb
+        sudo apt -f install
+        ##install vs code
+        sudo apt-get install wget gpg 
+        wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
+        sudo install -D -o root -g root -m 644 packages.microsoft.gpg /etc/apt/keyrings/packages.microsoft.gpg
+        sudo sh -c 'echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stab>
+        rm -f packages.microsoft.gpg 
+        sudo apt install apt-transport-https
+        sudo apt update
+        sudo apt install code
+    elif [ "$ID" = "centos" ] || [ "$ID" = "rhel" ]; then
+        echo "Detected CentOS/RHEL. Installing Git..."
+        sudo yum install -y nginx
+    else
+        echo "linux os not found"
+    fi
+else
+    echo "Unable to determine the Linux. installation not performed."
+fi
